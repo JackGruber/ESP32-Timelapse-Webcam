@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include "file.h"
-#include "camera.h"
 #include "lapse.h"
 
 const char* ssid = "...";
@@ -16,7 +15,6 @@ void setup()
 	Serial.println();
  
 	initFileSystem();
-	initCamera();
 
 	startCameraServer();
 }
