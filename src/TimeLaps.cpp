@@ -48,7 +48,6 @@ bool TimeLapsProcess(unsigned long dt)
     {
         lastFrameDelta -= frameInterval;
         camera_fb_t *fb = NULL;
-        esp_err_t res = ESP_OK;
         fb = esp_camera_fb_get();
         if (!fb)
         {
