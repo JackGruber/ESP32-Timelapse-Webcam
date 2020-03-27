@@ -26,8 +26,6 @@ const char *indexHtml =
 #include "index.html.h"
 	;
 
-extern unsigned long frameInterval;
-
 typedef struct
 {
 	httpd_req_t *req;
