@@ -1,7 +1,7 @@
 #include "FS.h"
 #include "SD_MMC.h"
 
-bool writeFile(const char *path, const unsigned char *data, unsigned long len)
+bool SDWriteFile(const char *path, const unsigned char *data, unsigned long len)
 {
 	Serial.printf("Writing file: %s\n", path);
 	File file = SD_MMC.open(path, FILE_WRITE);
@@ -23,7 +23,7 @@ bool writeFile(const char *path, const unsigned char *data, unsigned long len)
 	return true;
 }
 
-bool appendFile(const char *path, const unsigned char *data, unsigned long len)
+bool SDappendFile(const char *path, const unsigned char *data, unsigned long len)
 {
 	Serial.printf("Appending to file: %s\n", path);
 
@@ -46,9 +46,10 @@ bool appendFile(const char *path, const unsigned char *data, unsigned long len)
 	return true;
 }
 
-bool initFileSystem()
+bool SDInitFileSystem()
 {
-	if (!SD_MMC.begin())
+	Serial.println("Init file system");
+  if (!SD_MMC.begin())
 	{
 		Serial.println("Card Mount Failed");
 		return false;
@@ -78,7 +79,7 @@ bool initFileSystem()
 	return true;
 }
 
-bool createDir(const char *path)
+bool SDCreateDir(const char *path)
 {
 	Serial.printf("Creating Dir: %s\n", path);
 	if (SD_MMC.mkdir(path))
@@ -93,7 +94,7 @@ bool createDir(const char *path)
 	return true;
 }
 
-bool fileExists(const char *path)
+bool SDFileExists(const char *path)
 {
 	return SD_MMC.exists(path);
 }
