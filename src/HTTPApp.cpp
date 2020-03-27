@@ -18,7 +18,7 @@
 #include "esp_timer.h"
 #include "esp_camera.h"
 #include "Arduino.h"
-#include "EEPROM.h"
+
 #include "TimeLaps.h"
 #include "HTTPApp.h"
 
