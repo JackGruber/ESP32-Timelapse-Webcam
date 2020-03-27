@@ -37,6 +37,7 @@ bool TimeLapsStart()
 bool TimeLapsStop()
 {
     lapseRunning = false;
+    return true;
 }
 
 bool TimeLapsProcess(unsigned long dt)
