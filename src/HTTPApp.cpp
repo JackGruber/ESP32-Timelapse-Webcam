@@ -81,15 +81,8 @@ static esp_err_t capture_handler(httpd_req_t *req)
 	httpd_resp_set_hdr(req, "Content-Disposition", "inline; filename=capture.jpg");
 	httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
 
-	size_t out_len, out_width, out_height;
-	uint8_t *out_buf;
-	bool s;
-	bool detected = false;
-	int face_id = 0;
-	size_t fb_len = 0;
 	if (fb->format == PIXFORMAT_JPEG)
 	{
-		fb_len = fb->len;
 		res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
 	}
 	else
@@ -97,7 +90,6 @@ static esp_err_t capture_handler(httpd_req_t *req)
 		jpg_chunking_t jchunk = {req, 0};
 		res = frame2jpg_cb(fb, 80, jpg_encode_stream, &jchunk) ? ESP_OK : ESP_FAIL;
 		httpd_resp_send_chunk(req, NULL, 0);
-		fb_len = jchunk.len;
 	}
 	esp_camera_fb_return(fb);
 	return res;
@@ -312,7 +304,6 @@ static esp_err_t index_handler(httpd_req_t *req)
 {
 	httpd_resp_set_type(req, "text/html");
 	//httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-	sensor_t *s = esp_camera_sensor_get();
 	unsigned long l = strlen(indexHtml);
 	return httpd_resp_send(req, (const char *)indexHtml, l);
 }
