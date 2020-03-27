@@ -14,16 +14,16 @@
 //
 // modifed by bitluni 2020
 
-#include "file.h"
-#include "esp_http_server.h"
+#include "SD.h"
 #include "esp_timer.h"
 #include "esp_camera.h"
 #include "Arduino.h"
 #include "EEPROM.h"
-#include "lapse.h"
+#include "TimeLaps.h"
+#include "HTTPApp.h"
 
 const char *indexHtml =
-#include "index.h"
+#include "index.html.h"
 	;
 
 extern unsigned long frameInterval;
@@ -108,12 +108,12 @@ static esp_err_t capture_handler(httpd_req_t *req)
 
 static esp_err_t startLapseHandler(httpd_req_t *req)
 {
-	startLapse();
+	TimeLapsStart();
 }
 
 static esp_err_t stopLapseHandler(httpd_req_t *req)
 {
-	stopLapse();
+	TimeLapsStop();
 }
 
 static esp_err_t streamHandler(httpd_req_t *req)
@@ -254,7 +254,7 @@ static esp_err_t cmd_handler(httpd_req_t *req)
 	else if (!strcmp(variable, "ae_level"))
 		res = s->set_ae_level(s, val);
 	else if (!strcmp(variable, "interval"))
-		setInterval(val);
+		TimeLapsSetInterval(val);
 	else
 	{
 		res = -1;
