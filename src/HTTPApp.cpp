@@ -98,12 +98,14 @@ static esp_err_t capture_handler(httpd_req_t *req)
 
 static esp_err_t startLapseHandler(httpd_req_t *req)
 {
-	TimeLapsStart();
+	if(TimeLapsStart()) return ESP_OK;
+	else return ESP_FAIL;
 }
 
 static esp_err_t stopLapseHandler(httpd_req_t *req)
 {
-	TimeLapsStop();
+	if(TimeLapsStop()) return ESP_OK;
+	else return ESP_FAIL;
 }
 
 static esp_err_t streamHandler(httpd_req_t *req)
