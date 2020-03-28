@@ -1,5 +1,6 @@
 #include "FS.h"
 #include "SD_MMC.h"
+#include "settings.h"
 
 bool SDWriteFile(const char *path, const unsigned char *data, unsigned long len)
 {
@@ -49,11 +50,21 @@ bool SDappendFile(const char *path, const unsigned char *data, unsigned long len
 bool SDInitFileSystem()
 {
   Serial.println("Init file system");
-  if (!SD_MMC.begin())
-  {
-    Serial.println("Card Mount Failed");
-    return false;
-  }
+  #ifdef USE_SDMMC_1BIT
+    if (!SD_MMC.begin("/sdcard",true))
+    {
+      Serial.println("Card Mount Failed (SDMMC_HOST_FLAG_1BIT)");
+      return false;
+    }
+    pinMode(LED_FLASH, OUTPUT);
+    digitalWrite(LED_FLASH, LOW);
+  #else
+    if (!SD_MMC.begin())
+    {
+      Serial.println("Card Mount Failed");
+      return false;
+    }
+  #endif
   uint8_t cardType = SD_MMC.cardType();
 
   if (cardType == CARD_NONE)
