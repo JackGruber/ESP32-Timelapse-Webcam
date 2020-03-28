@@ -753,6 +753,7 @@ document.addEventListener('DOMContentLoaded', function (event)
   // Rotate img
   const rotate = document.getElementById('rotate')
   rotate.onchange = () => {
+    updateConfig(rotate)
     var rotateimg = document.getElementById("rotateimg")
     var angle = (rotate.value + 90) % 360;
     rotateimg.className = "rotate" + rotate.value;
