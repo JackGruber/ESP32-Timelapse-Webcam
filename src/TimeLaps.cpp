@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include "SD.h"
 
-unsigned long fileIndex = 0;
-unsigned long lapseIndex = 0;
+unsigned int fileIndex = 0;
+unsigned int lapseIndex = 0;
 unsigned long frameInterval = 1000;
 bool mjpeg = true;
 bool lapseRunning = false;
@@ -22,7 +22,7 @@ bool TimeLapsStart()
     char path[32];
     for(; lapseIndex < 10000; lapseIndex++)
     {
-        sprintf(path, "/lapse%03d", lapseIndex);
+        sprintf(path, "/lapse%03u", lapseIndex);
         if (!SDFileExists(path))
         {
             SDCreateDir(path);
@@ -37,6 +37,7 @@ bool TimeLapsStart()
 bool TimeLapsStop()
 {
     lapseRunning = false;
+    return true;
 }
 
 bool TimeLapsProcess(unsigned long dt)
@@ -48,7 +49,6 @@ bool TimeLapsProcess(unsigned long dt)
     {
         lastFrameDelta -= frameInterval;
         camera_fb_t *fb = NULL;
-        esp_err_t res = ESP_OK;
         fb = esp_camera_fb_get();
         if (!fb)
         {
@@ -57,7 +57,7 @@ bool TimeLapsProcess(unsigned long dt)
         }
 
         char path[32];
-        sprintf(path, "/lapse%03d/pic%05d.jpg", lapseIndex, fileIndex);
+        sprintf(path, "/lapse%03u/pic%05u.jpg", lapseIndex, fileIndex);
         Serial.println(path);
         if(!SDWriteFile(path, (const unsigned char *)fb->buf, fb->len))
         {
