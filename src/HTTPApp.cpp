@@ -40,7 +40,7 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 httpd_handle_t stream_httpd = NULL;
 httpd_handle_t camera_httpd = NULL;
 
-static size_t jpg_encode_stream(void *arg, size_t index, const void *data, size_t len)
+static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len)
 {
 	jpg_chunking_t *j = (jpg_chunking_t *)arg;
 	if (!index)
@@ -55,7 +55,7 @@ static size_t jpg_encode_stream(void *arg, size_t index, const void *data, size_
 	return len;
 }
 
-static esp_err_t capture_handler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerCapture(httpd_req_t *req)
 {
 	camera_fb_t *fb = NULL;
 	esp_err_t res = ESP_OK;
@@ -88,7 +88,7 @@ static esp_err_t capture_handler(httpd_req_t *req)
 	else
 	{
 		jpg_chunking_t jchunk = {req, 0};
-		res = frame2jpg_cb(fb, 80, jpg_encode_stream, &jchunk) ? ESP_OK : ESP_FAIL;
+		res = frame2jpg_cb(fb, 80, HTTPAppJPGEncodeStream, &jchunk) ? ESP_OK : ESP_FAIL;
 		httpd_resp_send_chunk(req, NULL, 0);
 	}
 	esp_camera_fb_return(fb);
@@ -96,19 +96,19 @@ static esp_err_t capture_handler(httpd_req_t *req)
 }
 
 
-static esp_err_t startLapseHandler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerStartLapse(httpd_req_t *req)
 {
 	if(TimeLapsStart()) return ESP_OK;
 	else return ESP_FAIL;
 }
 
-static esp_err_t stopLapseHandler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerStopLapse(httpd_req_t *req)
 {
 	if(TimeLapsStop()) return ESP_OK;
 	else return ESP_FAIL;
 }
 
-static esp_err_t streamHandler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerStream(httpd_req_t *req)
 {
 	camera_fb_t *fb = NULL;
 	esp_err_t res = ESP_OK;
@@ -139,7 +139,7 @@ static esp_err_t streamHandler(httpd_req_t *req)
 	return res;
 }
 
-static esp_err_t cmd_handler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 {
 	char *buf;
 	size_t buf_len;
@@ -261,7 +261,7 @@ static esp_err_t cmd_handler(httpd_req_t *req)
 	return httpd_resp_send(req, NULL, 0);
 }
 
-static esp_err_t status_handler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 {
 	static char json_response[1024];
 
@@ -294,7 +294,7 @@ static esp_err_t status_handler(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%u", frameInterval);
+	p += sprintf(p, "\"interval\":%lu", frameInterval);
 	*p++ = '}';
 	*p++ = 0;
 	httpd_resp_set_type(req, "application/json");
@@ -302,7 +302,7 @@ static esp_err_t status_handler(httpd_req_t *req)
 	return httpd_resp_send(req, json_response, strlen(json_response));
 }
 
-static esp_err_t index_handler(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerIndex(httpd_req_t *req)
 {
 	httpd_resp_set_type(req, "text/html");
 	//httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
@@ -310,50 +310,50 @@ static esp_err_t index_handler(httpd_req_t *req)
 	return httpd_resp_send(req, (const char *)indexHtml, l);
 }
 
-void startCameraServer()
+void HTTPAppStartCameraServer()
 {
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
 	httpd_uri_t index_uri = {
 		.uri = "/",
 		.method = HTTP_GET,
-		.handler = index_handler,
+		.handler = HTTPAppHandlerIndex,
 		.user_ctx = NULL};
 
 	httpd_uri_t status_uri = {
 		.uri = "/status",
 		.method = HTTP_GET,
-		.handler = status_handler,
+		.handler = HTTPAppHandlerStatus,
 		.user_ctx = NULL};
 
 	httpd_uri_t cmd_uri = {
 		.uri = "/control",
 		.method = HTTP_GET,
-		.handler = cmd_handler,
+		.handler = HTTPAppHandlerCMD,
 		.user_ctx = NULL};
 
 	httpd_uri_t capture_uri = {
 		.uri = "/capture",
 		.method = HTTP_GET,
-		.handler = capture_handler,
+		.handler = HTTPAppHandlerCapture,
 		.user_ctx = NULL};
 
 	httpd_uri_t stream_uri = {
 		.uri = "/stream",
 		.method = HTTP_GET,
-		.handler = streamHandler,
+		.handler = HTTPAppHandlerStream,
 		.user_ctx = NULL};
 
 	httpd_uri_t startLapse_uri = {
 		.uri = "/startLapse",
 		.method = HTTP_GET,
-		.handler = startLapseHandler,
+		.handler = HTTPAppHandlerStartLapse,
 		.user_ctx = NULL};
 
 	httpd_uri_t stopLapse_uri = {
 		.uri = "/stopLapse",
 		.method = HTTP_GET,
-		.handler = stopLapseHandler,
+		.handler = HTTPAppHandlerStopLapse,
 		.user_ctx = NULL};		
 
 	Serial.printf("Starting web server on port: '%d'\n", config.server_port);
