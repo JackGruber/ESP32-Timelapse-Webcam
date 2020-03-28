@@ -1,5 +1,10 @@
 # ESP32 Timelaps / Webcam
 
+## Configure
+
+* Rename `include\wifi_credentials.example` to `include\wifi_credentials.h` and enter your WiFi credentials in the file.
+* Remove the comment for your board in `include\pins_camera.h` and comment all other boards
+
 ## Create MP4 from timelaps JPG
 
 Converting the images to a video you can use [ffmpeg](https://www.ffmpeg.org/download.html) encoder.
