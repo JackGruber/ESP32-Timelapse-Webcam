@@ -110,33 +110,70 @@ static esp_err_t HTTPAppHandlerStopLapse(httpd_req_t *req)
 
 static esp_err_t HTTPAppHandlerStream(httpd_req_t *req)
 {
-	camera_fb_t *fb = NULL;
-	esp_err_t res = ESP_OK;
-	char *part_buf[64];
+    camera_fb_t * fb = NULL;
+    esp_err_t res = ESP_OK;
+    size_t _jpg_buf_len;
+    uint8_t * _jpg_buf;
+    char * part_buf[64];
+    static int64_t last_frame = 0;
+    if(!last_frame) {
+        last_frame = esp_timer_get_time();
+    }
 
-	res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
-	if (res != ESP_OK)
-		return res;
-	httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
-	do
-	{
-		fb = esp_camera_fb_get();
-		Serial.print("Frame size ");
-		Serial.println(fb->len);
-		if (!fb)
-		{
-			Serial.println("Camera capture failed");
-			continue;
-		}
-		size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, fb->len);
-		res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
-		if (res == ESP_OK)
-			res = httpd_resp_send_chunk(req, (const char *)fb->buf, fb->len);
-		if (res == ESP_OK)
-			res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
-		esp_camera_fb_return(fb);
-	} while(res == ESP_OK);
-	return res;
+    res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
+    if(res != ESP_OK){
+        return res;
+    }
+
+	res = httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+    while(true){
+        fb = esp_camera_fb_get();
+        if (!fb) {
+            Serial.println("Camera capture failed");
+            res = ESP_FAIL;
+            break;
+        }
+        if(fb->format != PIXFORMAT_JPEG){
+            bool jpeg_converted = frame2jpg(fb, 80, &_jpg_buf, &_jpg_buf_len);
+            if(!jpeg_converted){
+                 Serial.println("JPEG compression failed");
+                esp_camera_fb_return(fb);
+                res = ESP_FAIL;
+            }
+        } else {
+            _jpg_buf_len = fb->len;
+            _jpg_buf = fb->buf;
+        }
+
+        if(res == ESP_OK){
+            res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
+        }
+        if(res == ESP_OK){
+            size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, _jpg_buf_len);
+
+            res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
+        }
+        if(res == ESP_OK){
+            res = httpd_resp_send_chunk(req, (const char *)_jpg_buf, _jpg_buf_len);
+        }
+        if(fb->format != PIXFORMAT_JPEG){
+            free(_jpg_buf);
+        }
+        esp_camera_fb_return(fb);
+        if(res != ESP_OK){
+            break;
+        }
+        int64_t fr_end = esp_timer_get_time();
+        int64_t frame_time = fr_end - last_frame;
+        last_frame = fr_end;
+        frame_time /= 1000;
+        Serial.printf("MJPG: %uKB %ums (%.1ffps)\n",
+            (uint32_t)(_jpg_buf_len/1024),
+            (uint32_t)frame_time, 1000.0 / (uint32_t)frame_time);
+    }
+
+    last_frame = 0;
+    return res;
 }
 
 static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
