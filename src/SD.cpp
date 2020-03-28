@@ -1,4 +1,3 @@
-#include "FS.h"
 #include "SD_MMC.h"
 #include "settings.h"
 
