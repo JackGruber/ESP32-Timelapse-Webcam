@@ -98,14 +98,30 @@ static esp_err_t HTTPAppHandlerCaptureJPG(httpd_req_t *req)
 
 static esp_err_t HTTPAppHandlerStartLapse(httpd_req_t *req)
 {
-	if(TimeLapsStart()) return ESP_OK;
-	else return ESP_FAIL;
+	if(TimeLapsStart())
+	{
+		httpd_resp_send(req, "{\"status\": \"ok\"}", -1);
+		return ESP_OK;
+	}
+	else 
+	{
+		httpd_resp_send(req, "{\"status\": \"error\"}", -1);
+		return ESP_FAIL;
+	}
 }
 
 static esp_err_t HTTPAppHandlerStopLapse(httpd_req_t *req)
 {
-	if(TimeLapsStop()) return ESP_OK;
-	else return ESP_FAIL;
+	if(TimeLapsStop())
+	{
+		httpd_resp_send(req, "{\"status\": \"ok\"}", -1);
+		return ESP_OK;
+	}
+	else 
+	{
+		httpd_resp_send(req, "{\"status\": \"error\"}", -1);
+		return ESP_FAIL;
+	}
 }
 
 static esp_err_t HTTPAppHandlerStream(httpd_req_t *req)
