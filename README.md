@@ -4,7 +4,7 @@
 
 Converting the images to a video you can use [ffmpeg](https://www.ffmpeg.org/download.html) encoder.
 ```
-ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -crf 23 -pix_fmt yuv420p "C:\Temp\timelapse\timelapse.mp4"
+ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -crf 23 -pix_fmt yuv420p -vf "transpose=1" "C:\Temp\timelapse\timelapse.mp4"
 ```
 
 ### Parameters 
@@ -16,7 +16,7 @@ ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -c
 * `-pix_fmt <pixel format>` specifies the pixel format
 * `-start_number <number>` defines the start number, if not to be started at picture 0
 * `-vframes <number>` specifies the number frames/images in the video, if not all images should be used
-
+* `-vf "transpose=<number>"` Rotating: 0 = 90° Counterclockwise, 1 = 90° Clockwise, 2 = 90° Counterclockwise, 3 = 90° Clockwise and Vertical Flip. Use `-vf "transpose=2,transpose=2"` for 180 degrees
 
 ## Links
 * [Original GitHub repro ESP32CamTimeLapse](https://github.com/bitluni/ESP32CamTimeLapse)
