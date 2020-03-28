@@ -15,7 +15,7 @@ void setup()
 
   WiFiInit();
 
-  startCameraServer();
+  HTTPAppStartCameraServer();
 }
 
 void loop() 
