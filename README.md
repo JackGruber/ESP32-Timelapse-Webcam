@@ -23,6 +23,11 @@ ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -c
 * `-vframes <number>` specifies the number frames/images in the video, if not all images should be used
 * `-vf "transpose=<number>"` Rotating: 0 = 90° Counterclockwise, 1 = 90° Clockwise, 2 = 90° Counterclockwise, 3 = 90° Clockwise and Vertical Flip. Use `-vf "transpose=2,transpose=2"` for 180 degrees
 
+## ToDO
+* Add NTP time sync
+* Add DeepSleep option for timelaps
+* Save configuration from web permanently
+
 ## Links
 * [Original GitHub repro ESP32CamTimeLapse](https://github.com/bitluni/ESP32CamTimeLapse)
 * [Project page from the ESP32CamTimeLapse](https://bitluni.net/esp32camtimelapse)
