@@ -40,6 +40,8 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 httpd_handle_t stream_httpd = NULL;
 httpd_handle_t camera_httpd = NULL;
 
+int ROTATE = 0;
+
 static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len)
 {
 	jpg_chunking_t *j = (jpg_chunking_t *)arg;
@@ -247,6 +249,10 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 		res = s->set_ae_level(s, val);
 	else if (!strcmp(variable, "interval"))
 		TimeLapsSetInterval(val);
+	else if (!strcmp(variable, "rotate")) 
+	{
+		ROTATE = val;
+	}
 	else
 	{
 		res = -1;
@@ -294,7 +300,8 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%lu", frameInterval);
+	p += sprintf(p, "\"interval\":%lu,", frameInterval);
+	p += sprintf(p, "\"rotate\":%d", ROTATE);
 	*p++ = '}';
 	*p++ = 0;
 	httpd_resp_set_type(req, "application/json");
