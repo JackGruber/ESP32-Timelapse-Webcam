@@ -57,10 +57,12 @@ static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, 
 	return len;
 }
 
-static esp_err_t HTTPAppHandlerCapture(httpd_req_t *req)
+static esp_err_t HTTPAppHandlerCaptureJPG(httpd_req_t *req)
 {
 	camera_fb_t *fb = NULL;
 	esp_err_t res = ESP_OK;
+    size_t fb_len = 0;
+    int64_t fr_start = esp_timer_get_time();
 
 	fb = esp_camera_fb_get();
 	if (!fb)
@@ -69,32 +71,28 @@ static esp_err_t HTTPAppHandlerCapture(httpd_req_t *req)
 		httpd_resp_send_500(req);
 		return ESP_FAIL;
 	}
-/*
-	char path[20];
-	sprintf(path, "/%04d", projectIndex);
-	if (!fileExists(path))
-		createDir(path);
-	sprintf(path, "/%04d/%08d.jpg", projectIndex, fileIndex);
-	Serial.println(path);
-	writeBinary(path, (const unsigned char *)fb->buf, fb->len);
-	fileIndex++;*/
 
-	httpd_resp_set_type(req, "image/jpeg");
-	httpd_resp_set_hdr(req, "Content-Disposition", "inline; filename=capture.jpg");
-	httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+    res = httpd_resp_set_type(req, "image/jpeg");
+    if(res == ESP_OK){
+        res = httpd_resp_set_hdr(req, "Content-Disposition", "inline; filename=capture.jpg");
+        res = httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+    }
 
-	if (fb->format == PIXFORMAT_JPEG)
-	{
-		res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
-	}
-	else
-	{
-		jpg_chunking_t jchunk = {req, 0};
-		res = frame2jpg_cb(fb, 80, HTTPAppJPGEncodeStream, &jchunk) ? ESP_OK : ESP_FAIL;
-		httpd_resp_send_chunk(req, NULL, 0);
-	}
-	esp_camera_fb_return(fb);
-	return res;
+    if(res == ESP_OK){
+        if(fb->format == PIXFORMAT_JPEG){
+            fb_len = fb->len;
+            res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
+        } else {
+            jpg_chunking_t jchunk = {req, 0};
+            res = frame2jpg_cb(fb, 80, HTTPAppJPGEncodeStream, &jchunk)?ESP_OK:ESP_FAIL;
+            httpd_resp_send_chunk(req, NULL, 0);
+            fb_len = jchunk.len;
+        }
+    }
+    esp_camera_fb_return(fb);
+    int64_t fr_end = esp_timer_get_time();
+    Serial.printf("JPG: %uKB %ums\n", (uint32_t)(fb_len/1024), (uint32_t)((fr_end - fr_start)/1000));
+    return res;
 }
 
 
@@ -342,7 +340,7 @@ void HTTPAppStartCameraServer()
 	httpd_uri_t capture_uri = {
 		.uri = "/capture",
 		.method = HTTP_GET,
-		.handler = HTTPAppHandlerCapture,
+		.handler = HTTPAppHandlerCaptureJPG,
 		.user_ctx = NULL};
 
 	httpd_uri_t stream_uri = {
