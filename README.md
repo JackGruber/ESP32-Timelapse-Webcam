@@ -1,5 +1,9 @@
 # ESP32 Timelaps / Webcam
 
+ESP32 Cam project for timelaps and streaming
+
+<img src="img/http_app.jpg">
+
 ## Configure
 
 * Rename `include\wifi_credentials.example` to `include\wifi_credentials.h` and enter your WiFi credentials in the file.
