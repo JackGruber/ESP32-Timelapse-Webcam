@@ -4,6 +4,7 @@
 
 bool SDWriteFile(const char *path, const unsigned char *data, unsigned long len)
 {
+  int64_t start = esp_timer_get_time();
   Serial.printf("Writing file: %s\n", path);
   File file = SD_MMC.open(path, FILE_WRITE);
   if (!file)
@@ -13,6 +14,9 @@ bool SDWriteFile(const char *path, const unsigned char *data, unsigned long len)
   }
   if (file.write(data, len))
   {
+    int64_t end = esp_timer_get_time();
+    int64_t time = (end - start) / 1000;
+    Serial.printf("File written: %ums \n",(uint32_t)time);
     Serial.println("File written");
   }
   else
