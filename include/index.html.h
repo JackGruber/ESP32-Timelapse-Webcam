@@ -319,7 +319,7 @@ R"(<!doctype html>
 
             .close {
                 position: absolute;
-                right: 5px;
+                left: 5px;
                 top: 5px;
                 background: #ff3034;
                 width: 16px;
@@ -334,6 +334,31 @@ R"(<!doctype html>
             .hidden {
                 display: none
             }
+
+            #stream {
+              transform-origin: top left;
+              /* IE 10+, Firefox, etc. */
+              -webkit-transform-origin: top left;
+              /* Chrome */
+              -ms-transform-origin: top left;
+              /* IE 9 */
+            }
+            #rotateimg.rotate90 #stream {
+              transform: rotate(90deg) translateY(-100%);
+              -webkit-transform: rotate(90deg) translateY(-100%);
+              -ms-transform: rotate(90deg) translateY(-100%);
+            }
+            #rotateimg.rotate180 #stream {
+              transform: rotate(180deg) translate(-100%, -100%);
+              -webkit-transform: rotate(180deg) translate(-100%, -100%);
+              -ms-transform: rotate(180deg) translateX(-100%, -100%);
+            }
+            #rotateimg.rotate270 #stream {
+              transform: rotate(270deg) translateX(-100%);
+              -webkit-transform: rotate(270deg) translateX(-100%);
+              -ms-transform: rotate(270deg) translateX(-100%);
+            }
+
         </style>
     </head>
     <body>
@@ -507,6 +532,15 @@ R"(<!doctype html>
                                 <label class="slider" for="dcw"></label>
                             </div>
                         </div>
+                        <div class="input-group" id="rotate-group">
+                            <label for="rotate">Rotate</label>
+                            <select id="rotate" class="no-default-action">
+                                <option value="0" selected="selected">0</option>
+                                <option value="90">90</option>
+                                <option value="180">180</option>
+                                <option value="270">270</option>
+                            </select>
+                        </div>
                         <div class="input-group" id="interval-group">
                             <label for="interval">Time-Lapse Interval [ms]</label>
                             <input type="number" id="interval" min="0" max="1000000000" value="1000" class="default-action">
@@ -520,8 +554,10 @@ R"(<!doctype html>
                 </div>
                 <figure>
                     <div id="stream-container" class="image-container hidden">
-                        <div class="close" id="close-stream">×</div>
+                      <div id="rotateimg" class="rotate0">
                         <img id="stream" src="">
+                      </div>
+                      <div class="close" id="close-stream">×</div>
                     </div>
                 </figure>
             </div>
@@ -714,6 +750,14 @@ document.addEventListener('DOMContentLoaded', function (event)
     })
 
   // Custom actions
+  // Rotate img
+  const rotate = document.getElementById('rotate')
+  rotate.onchange = () => {
+    var rotateimg = document.getElementById("rotateimg")
+    var angle = (rotate.value + 90) % 360;
+    rotateimg.className = "rotate" + rotate.value;
+  }
+
   // Gain
   const agc = document.getElementById('agc')
   const agcGain = document.getElementById('agc_gain-group')
