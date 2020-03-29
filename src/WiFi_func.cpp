@@ -23,7 +23,7 @@ void WiFiInit(void)
 
 void WiFiConnectSTA(void)
 {
-  Serial.println("Connect WiFi ...");
+  Serial.print("Connect WiFi ..");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(STA_SSID, STA_PASSWORD);
@@ -35,7 +35,17 @@ void WiFiConnectSTA(void)
   }
 
   Serial.println("");
+  Serial.println("=======================================");
   Serial.println("WiFi connected");
+  Serial.print("ESP32 MAC: ");
+  Serial.println(WiFi.macAddress());
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("IP Subnetmask: ");
+  Serial.println(WiFi.subnetMask());
+  Serial.print("Gateway: ");
+  Serial.println(WiFi.gatewayIP());
+  Serial.println("=======================================");
 }
 
 void WiFiCreateAP(void)
