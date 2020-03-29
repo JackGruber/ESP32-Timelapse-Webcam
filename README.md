@@ -1,6 +1,8 @@
 # ESP32 Timelaps / Webcam
 
-ESP32 Cam project for timelaps and streaming
+ESP32 Cam project for timelaps and streaming.
+
+The project was started with the code of [bitluni/ESP32CamTimeLapse](https://github.com/bitluni/ESP32CamTimeLapse).
 
 <img src="img/http_app.jpg">
 
