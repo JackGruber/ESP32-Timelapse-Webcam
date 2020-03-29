@@ -23,6 +23,10 @@ void RTSPStreamIni(void)
     rtspServer.begin();
     rtspServer.setTimeout(1);
     //cam.init(esp32cam_aithinker_config);
+    Serial.print("RTSP Stream: ");
+    Serial.print("rtsp://");
+    Serial.print(WiFi.localIP());
+    Serial.print(":554/mjpeg/1");
 }
 
 void RTSPStream(void)
