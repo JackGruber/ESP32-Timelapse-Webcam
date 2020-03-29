@@ -4,6 +4,7 @@
 #include "SD.h"
 #include "TimeLaps.h"
 #include "HTTPApp.h"
+#include "rtspstream.h"
 
 void setup() 
 {
@@ -16,9 +17,12 @@ void setup()
   WiFiInit();
 
   HTTPAppStartCameraServer();
+
+  RTSPStreamIni();
 }
 
 void loop() 
 {
 	TimeLapsProcess();
+  RTSPStream();
 }
