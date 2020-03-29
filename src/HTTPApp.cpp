@@ -351,7 +351,7 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%lu,", frameInterval);
+	p += sprintf(p, "\"interval\":%lu,", TIMELAPSINTERVAL);
 	p += sprintf(p, "\"rotate\":%d", ROTATE);
 	*p++ = '}';
 	*p++ = 0;

@@ -2,11 +2,11 @@
 #ifndef _TIMELAPS_H
 #define _TIMELAPS_H
 
-extern unsigned long frameInterval;
+extern unsigned long TIMELAPSINTERVAL;
 
 void TimeLapsSetInterval(unsigned long delta);
 bool TimeLapsStart();
 bool TimeLapsStop();
-bool TimeLapsProcess(unsigned long dt);
+bool TimeLapsProcess();
 
 #endif

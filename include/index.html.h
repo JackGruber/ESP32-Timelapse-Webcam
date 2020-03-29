@@ -542,8 +542,8 @@ R"(<!doctype html>
                             </select>
                         </div>
                         <div class="input-group" id="interval-group">
-                            <label for="interval">Time-Lapse Interval [ms]</label>
-                            <input type="number" id="interval" min="0" max="1000000000" value="1000" class="default-action">
+                            <label for="interval">Time-Lapse Interval [seconds]</label>
+                            <input type="number" id="interval" min="0" max="86400" value="1" class="default-action">
                         </div>
                         <section id="buttons">
                             <button id="get-still">Get Still</button>
