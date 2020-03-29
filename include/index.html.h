@@ -3,7 +3,7 @@ R"(<!doctype html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>ESP32 OV2460</title>
+        <title>ESP32-CAM</title>
         <style>
             body {
                 font-family: Arial,Helvetica,sans-serif;
@@ -364,7 +364,7 @@ R"(<!doctype html>
     <body>
         <section class="main">
             <div id="logo">
-                <label for="nav-toggle-cb" id="nav-toggle">&#9776;&nbsp;&nbsp;Toggle OV2640 settings</label>
+                <label for="nav-toggle-cb" id="nav-toggle">&#9776;&nbsp;&nbsp;Toggle CAM settings</label>
             </div>
             <div id="content">
                 <div id="sidebar">
