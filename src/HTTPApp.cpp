@@ -32,6 +32,15 @@ typedef struct
 	size_t len;
 } jpg_chunking_t;
 
+static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len);
+static esp_err_t HTTPAppHandlerCaptureJPG(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerStartLapse(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerStopLapse(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerStream(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req);
+static esp_err_t HTTPAppHandlerIndex(httpd_req_t *req);
+
 #define PART_BOUNDARY "123456789000000000000987654321"
 static const char *_STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
 static const char *_STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
@@ -351,7 +360,7 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%lu,", frameInterval);
+	p += sprintf(p, "\"interval\":%lu,", TIMELAPSINTERVAL);
 	p += sprintf(p, "\"rotate\":%d", ROTATE);
 	*p++ = '}';
 	*p++ = 0;

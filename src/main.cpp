@@ -20,9 +20,5 @@ void setup()
 
 void loop() 
 {
-	unsigned long t = millis();
-	static unsigned long ot = 0;
-	unsigned long dt = t - ot;
-	ot = t;
-	TimeLapsProcess(dt);
+	TimeLapsProcess();
 }

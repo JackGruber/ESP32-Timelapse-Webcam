@@ -41,12 +41,14 @@ bool CameraInit(void)
   //init with high specs to pre-allocate larger buffers
   if (psramFound())
   {
+    Serial.println("PSRAM found");
     camera_config.frame_size = FRAMESIZE_UXGA;
     camera_config.jpeg_quality = 10;
     camera_config.fb_count = 2;
   }
   else
   {
+    Serial.println("No PSRAM found");
     camera_config.frame_size = FRAMESIZE_SVGA;
     camera_config.jpeg_quality = 12;
     camera_config.fb_count = 1;
