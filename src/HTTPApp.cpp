@@ -21,6 +21,7 @@
 
 #include "TimeLaps.h"
 #include "HTTPApp.h"
+#include "Pref.h"
 #include "camera.h"
 
 const char *indexHtml =
@@ -49,8 +50,6 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 
 httpd_handle_t stream_httpd = NULL;
 httpd_handle_t camera_httpd = NULL;
-
-int ROTATE = 0;
 
 static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len)
 {
@@ -309,10 +308,13 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 	else if (!strcmp(variable, "ae_level"))
 		res = s->set_ae_level(s, val);
 	else if (!strcmp(variable, "interval"))
+	{
 		TimeLapsSetInterval(val);
+		PrefSaveInt("interval",val, true);
+	}
 	else if (!strcmp(variable, "rotate")) 
 	{
-		ROTATE = val;
+		PrefSaveInt("rotate",val, true);
 	}
 	else
 	{
@@ -337,7 +339,7 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	sensor_t *s = esp_camera_sensor_get();
 	char *p = json_response;
 	*p++ = '{';
-
+ 
 	p += sprintf(p, "\"framesize\":%u,", s->status.framesize);
 	p += sprintf(p, "\"quality\":%u,", s->status.quality);
 	p += sprintf(p, "\"brightness\":%d,", s->status.brightness);
@@ -363,8 +365,8 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%lu,", TIMELAPSINTERVAL);
-	p += sprintf(p, "\"rotate\":%d", ROTATE);
+	p += sprintf(p, "\"interval\":%d,", PrefLoadInt("interval", 0, true));
+	p += sprintf(p, "\"rotate\":%d", PrefLoadInt("rotate", 0, true) );
 	*p++ = '}';
 	*p++ = 0;
 	httpd_resp_set_type(req, "application/json");
