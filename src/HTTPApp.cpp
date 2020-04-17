@@ -21,6 +21,7 @@
 
 #include "TimeLaps.h"
 #include "HTTPApp.h"
+#include "camera.h"
 
 const char *indexHtml =
 #include "index.html.h"
@@ -322,6 +323,8 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 	{
 		return httpd_resp_send_500(req);
 	}
+
+	CameraSaveSettings();
 
 	httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
 	return httpd_resp_send(req, NULL, 0);
