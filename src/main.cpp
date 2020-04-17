@@ -16,6 +16,7 @@ void setup()
 
   SDInitFileSystem();
   CameraInit();
+  if(CameraLoadSettings()) { Serial.println("Setting Load OK"); };
 
   WiFiInit();
 
