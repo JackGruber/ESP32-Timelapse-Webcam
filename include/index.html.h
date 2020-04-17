@@ -534,7 +534,7 @@ R"(<!doctype html>
                         </div>
                         <div class="input-group" id="rotate-group">
                             <label for="rotate">Rotate</label>
-                            <select id="rotate" class="no-default-action">
+                            <select id="rotate" class="default-action">
                                 <option value="0" selected="selected">0</option>
                                 <option value="90">90</option>
                                 <option value="180">180</option>
@@ -616,7 +616,17 @@ document.addEventListener('DOMContentLoaded', function (event)
       } else if(el.id === "awb_gain"){
         value ? show(wb) : hide(wb)
       }
+      else  if(el.id === "rotate")
+      {
+        RotateImg(rotate.value)
+      }
     }
+  }
+
+  function RotateImg(value) {
+    var rotateimg = document.getElementById("rotateimg")
+    var angle = (value + 90) % 360;
+    rotateimg.className = "rotate" + value;
   }
 
   function updateConfig (el) {
@@ -754,9 +764,7 @@ document.addEventListener('DOMContentLoaded', function (event)
   const rotate = document.getElementById('rotate')
   rotate.onchange = () => {
     updateConfig(rotate)
-    var rotateimg = document.getElementById("rotateimg")
-    var angle = (rotate.value + 90) % 360;
-    rotateimg.className = "rotate" + rotate.value;
+    RotateImg(rotate.value)
   }
 
   // Gain
