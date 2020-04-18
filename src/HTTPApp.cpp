@@ -21,6 +21,8 @@
 
 #include "TimeLaps.h"
 #include "HTTPApp.h"
+#include "Pref.h"
+#include "camera.h"
 
 const char *indexHtml =
 #include "index.html.h"
@@ -49,7 +51,7 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 httpd_handle_t stream_httpd = NULL;
 httpd_handle_t camera_httpd = NULL;
 
-int ROTATE = 0;
+extern unsigned long ESP_RESTART;
 
 static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len)
 {
@@ -308,10 +310,13 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 	else if (!strcmp(variable, "ae_level"))
 		res = s->set_ae_level(s, val);
 	else if (!strcmp(variable, "interval"))
+	{
 		TimeLapsSetInterval(val);
+		PrefSaveInt("interval",val, true);
+	}
 	else if (!strcmp(variable, "rotate")) 
 	{
-		ROTATE = val;
+		PrefSaveInt("rotate",val, true);
 	}
 	else
 	{
@@ -322,6 +327,8 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 	{
 		return httpd_resp_send_500(req);
 	}
+
+	CameraSaveSettings();
 
 	httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
 	return httpd_resp_send(req, NULL, 0);
@@ -334,7 +341,7 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	sensor_t *s = esp_camera_sensor_get();
 	char *p = json_response;
 	*p++ = '{';
-
+ 
 	p += sprintf(p, "\"framesize\":%u,", s->status.framesize);
 	p += sprintf(p, "\"quality\":%u,", s->status.quality);
 	p += sprintf(p, "\"brightness\":%d,", s->status.brightness);
@@ -360,8 +367,8 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%lu,", TIMELAPSINTERVAL);
-	p += sprintf(p, "\"rotate\":%d", ROTATE);
+	p += sprintf(p, "\"interval\":%d,", PrefLoadInt("interval", 0, true));
+	p += sprintf(p, "\"rotate\":%d", PrefLoadInt("rotate", 0, true) );
 	*p++ = '}';
 	*p++ = 0;
 	httpd_resp_set_type(req, "application/json");
@@ -375,6 +382,14 @@ static esp_err_t HTTPAppHandlerIndex(httpd_req_t *req)
 	//httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
 	unsigned long l = strlen(indexHtml);
 	return httpd_resp_send(req, (const char *)indexHtml, l);
+}
+
+static esp_err_t HTTPAppHandlerResetPref(httpd_req_t *req)
+{
+	httpd_resp_send(req, "{\"resetPref\": \"ok\"}", -1);
+	PrefSaveInt("clearsettings",1 , true);
+	ESP_RESTART = millis() + 500;
+	return ESP_OK;
 }
 
 void HTTPAppStartCameraServer()
@@ -423,6 +438,12 @@ void HTTPAppStartCameraServer()
 		.handler = HTTPAppHandlerStopLapse,
 		.user_ctx = NULL};		
 
+	httpd_uri_t resetPref_uri = {
+		.uri = "/resetPref",
+		.method = HTTP_GET,
+		.handler = HTTPAppHandlerResetPref,
+		.user_ctx = NULL};	
+
 	Serial.printf("Starting web server on port: '%d'\n", config.server_port);
 	if (httpd_start(&camera_httpd, &config) == ESP_OK)
 	{
@@ -433,6 +454,7 @@ void HTTPAppStartCameraServer()
 
 		httpd_register_uri_handler(camera_httpd, &startLapse_uri);
 		httpd_register_uri_handler(camera_httpd, &stopLapse_uri);
+		httpd_register_uri_handler(camera_httpd, &resetPref_uri);
 	}
 
 	config.server_port += 1;

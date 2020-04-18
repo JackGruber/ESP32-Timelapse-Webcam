@@ -534,7 +534,7 @@ R"(<!doctype html>
                         </div>
                         <div class="input-group" id="rotate-group">
                             <label for="rotate">Rotate</label>
-                            <select id="rotate" class="no-default-action">
+                            <select id="rotate" class="default-action">
                                 <option value="0" selected="selected">0</option>
                                 <option value="90">90</option>
                                 <option value="180">180</option>
@@ -549,6 +549,9 @@ R"(<!doctype html>
                             <button id="get-still">Get Still</button>
                             <button id="toggle-lapse">Start Time-Lapse</button>
                             <button id="toggle-stream">Start Stream</button>
+                        </section>
+                        <section id="buttons">
+                            <button id="resetpref">Reset Settings</button>
                         </section>
                     </nav>
                 </div>
@@ -616,8 +619,23 @@ document.addEventListener('DOMContentLoaded', function (event)
       } else if(el.id === "awb_gain"){
         value ? show(wb) : hide(wb)
       }
+      else  if(el.id === "rotate")
+      {
+        RotateImg(rotate.value)
+      }
     }
   }
+
+  function RotateImg(value) {
+    var rotateimg = document.getElementById("rotateimg")
+    var angle = (value + 90) % 360;
+    rotateimg.className = "rotate" + value;
+  }
+
+  function ReloadAfterReset(){
+    window.location.reload(true);
+  }
+
 
   function updateConfig (el) {
     let value
@@ -626,6 +644,7 @@ document.addEventListener('DOMContentLoaded', function (event)
         value = el.checked ? 1 : 0
         break
       case 'range':
+        value = el.value
       	break
       case 'select-one':
         value = el.value
@@ -679,6 +698,7 @@ document.addEventListener('DOMContentLoaded', function (event)
   const streamButton = document.getElementById('toggle-stream')
   const lapseButton = document.getElementById('toggle-lapse')
   const closeButton = document.getElementById('close-stream')
+  const resetprefButton = document.getElementById('resetpref')
 
   const stopStream = () => {
     window.stop();
@@ -742,6 +762,15 @@ document.addEventListener('DOMContentLoaded', function (event)
 	//updateConfig(lapseButton)
   }
 
+  resetprefButton.onclick = () => {
+    const query = `${baseHost}/resetPref`
+
+    fetch(query)
+      .then(response => {
+        window.setTimeout(ReloadAfterReset, 2000);
+      })
+  }
+
   // Attach default on change action
   document
     .querySelectorAll('.default-action')
@@ -754,9 +783,7 @@ document.addEventListener('DOMContentLoaded', function (event)
   const rotate = document.getElementById('rotate')
   rotate.onchange = () => {
     updateConfig(rotate)
-    var rotateimg = document.getElementById("rotateimg")
-    var angle = (rotate.value + 90) % 360;
-    rotateimg.className = "rotate" + rotate.value;
+    RotateImg(rotate.value)
   }
 
   // Gain
