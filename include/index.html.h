@@ -550,6 +550,9 @@ R"(<!doctype html>
                             <button id="toggle-lapse">Start Time-Lapse</button>
                             <button id="toggle-stream">Start Stream</button>
                         </section>
+                        <section id="buttons">
+                            <button id="resetpref">Reset Settings</button>
+                        </section>
                     </nav>
                 </div>
                 <figure>
@@ -629,6 +632,11 @@ document.addEventListener('DOMContentLoaded', function (event)
     rotateimg.className = "rotate" + value;
   }
 
+  function ReloadAfterReset(){
+    window.location.reload(true);
+  }
+
+
   function updateConfig (el) {
     let value
     switch (el.type) {
@@ -689,6 +697,7 @@ document.addEventListener('DOMContentLoaded', function (event)
   const streamButton = document.getElementById('toggle-stream')
   const lapseButton = document.getElementById('toggle-lapse')
   const closeButton = document.getElementById('close-stream')
+  const resetprefButton = document.getElementById('resetpref')
 
   const stopStream = () => {
     window.stop();
@@ -750,6 +759,15 @@ document.addEventListener('DOMContentLoaded', function (event)
       startLapse()
     }
 	//updateConfig(lapseButton)
+  }
+
+  resetprefButton.onclick = () => {
+    const query = `${baseHost}/resetPref`
+
+    fetch(query)
+      .then(response => {
+        window.setTimeout(ReloadAfterReset, 2000);
+      })
   }
 
   // Attach default on change action

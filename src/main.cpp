@@ -9,6 +9,7 @@
 #include "Pref.h"
 
 bool STOP_RESET = false;
+unsigned long ESP_RESTART = 0;
 
 void setup() 
 {
@@ -37,5 +38,10 @@ void loop()
     Serial.println("Stop config reset on boot");
     PrefSaveInt("clearsettings",0 , true); 
     STOP_RESET = true;
+  }
+
+  if(ESP_RESTART != 0 && millis() > ESP_RESTART)
+  {
+    ESP.restart();
   }
 }

@@ -51,6 +51,8 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 httpd_handle_t stream_httpd = NULL;
 httpd_handle_t camera_httpd = NULL;
 
+extern unsigned long ESP_RESTART;
+
 static size_t HTTPAppJPGEncodeStream(void *arg, size_t index, const void *data, size_t len)
 {
 	jpg_chunking_t *j = (jpg_chunking_t *)arg;
@@ -382,6 +384,14 @@ static esp_err_t HTTPAppHandlerIndex(httpd_req_t *req)
 	return httpd_resp_send(req, (const char *)indexHtml, l);
 }
 
+static esp_err_t HTTPAppHandlerResetPref(httpd_req_t *req)
+{
+	httpd_resp_send(req, "{\"resetPref\": \"ok\"}", -1);
+	PrefSaveInt("clearsettings",1 , true);
+	ESP_RESTART = millis() + 500;
+	return ESP_OK;
+}
+
 void HTTPAppStartCameraServer()
 {
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -428,6 +438,12 @@ void HTTPAppStartCameraServer()
 		.handler = HTTPAppHandlerStopLapse,
 		.user_ctx = NULL};		
 
+	httpd_uri_t resetPref_uri = {
+		.uri = "/resetPref",
+		.method = HTTP_GET,
+		.handler = HTTPAppHandlerResetPref,
+		.user_ctx = NULL};	
+
 	Serial.printf("Starting web server on port: '%d'\n", config.server_port);
 	if (httpd_start(&camera_httpd, &config) == ESP_OK)
 	{
@@ -438,6 +454,7 @@ void HTTPAppStartCameraServer()
 
 		httpd_register_uri_handler(camera_httpd, &startLapse_uri);
 		httpd_register_uri_handler(camera_httpd, &stopLapse_uri);
+		httpd_register_uri_handler(camera_httpd, &resetPref_uri);
 	}
 
 	config.server_port += 1;
