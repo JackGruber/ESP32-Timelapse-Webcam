@@ -6,6 +6,13 @@ The project was started with the code of [bitluni/ESP32CamTimeLapse](https://git
 
 <img src="img/http_app.jpg">
 
+## Functions
+
+* Webpage
+* Rotate Img / Stream
+* Changed values are saved permanently
+* To reset saved settings to default use webpage or restart ESP32 twice within 10 seconds
+
 ## Configure
 
 * Rename `include\wifi_credentials.example` to `include\wifi_credentials.h` and enter your WiFi credentials in the file.
@@ -32,7 +39,6 @@ ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -c
 ## ToDO
 * Add NTP time sync
 * Add DeepSleep option for timelaps
-* Save configuration from web permanently
 
 ## Links
 * [Original GitHub repro ESP32CamTimeLapse](https://github.com/bitluni/ESP32CamTimeLapse)
