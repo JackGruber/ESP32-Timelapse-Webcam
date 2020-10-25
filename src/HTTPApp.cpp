@@ -313,6 +313,10 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 	{
 		PrefSaveInt("interval",val, true);
 	}
+	else if (!strcmp(variable, "deepsleep"))
+	{
+		PrefSaveInt("deepsleep",val, true);
+	}
 	else if (!strcmp(variable, "rotate")) 
 	{
 		PrefSaveInt("rotate",val, true);
@@ -367,7 +371,7 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
 	p += sprintf(p, "\"interval\":%d,", PrefLoadInt("interval", DEFAULT_INTERVAL, true));
-	p += sprintf(p, "\"deepsleep\":%u,", PrefLoadInt("deepsleep", 0, true));
+	p += sprintf(p, "\"deepsleep\":%u,", PrefLoadInt("deepsleep", DEFAULT_DEEPSLEEP, true));
 	p += sprintf(p, "\"rotate\":%d", PrefLoadInt("rotate", 0, true) );
 	*p++ = '}';
 	*p++ = 0;
