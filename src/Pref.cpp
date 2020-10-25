@@ -6,7 +6,7 @@ Preferences pref;
 
 void PrefInit(void)
 {
-    pref.begin("timelapspref", false);
+    pref.begin("timelapsepref", false);
 }
 
 int PrefLoadInt(const char *preferences, int default_value, bool initpref)

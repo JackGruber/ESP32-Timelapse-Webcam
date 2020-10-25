@@ -18,8 +18,7 @@
 #include "esp_timer.h"
 #include "esp_camera.h"
 #include "Arduino.h"
-
-#include "TimeLaps.h"
+#include "TimeLapse.h"
 #include "HTTPApp.h"
 #include "Pref.h"
 #include "camera.h"
@@ -109,7 +108,7 @@ static esp_err_t HTTPAppHandlerCaptureJPG(httpd_req_t *req)
 
 static esp_err_t HTTPAppHandlerStartLapse(httpd_req_t *req)
 {
-	if(TimeLapsStart())
+	if(TimeLapseStart())
 	{
 		httpd_resp_send(req, "{\"status\": \"ok\"}", -1);
 		return ESP_OK;
@@ -123,7 +122,7 @@ static esp_err_t HTTPAppHandlerStartLapse(httpd_req_t *req)
 
 static esp_err_t HTTPAppHandlerStopLapse(httpd_req_t *req)
 {
-	if(TimeLapsStop())
+	if(TimeLapseStop())
 	{
 		httpd_resp_send(req, "{\"status\": \"ok\"}", -1);
 		return ESP_OK;

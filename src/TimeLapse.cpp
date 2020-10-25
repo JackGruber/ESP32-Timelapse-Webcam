@@ -6,16 +6,16 @@
 #include "settings.h"
 #include "driver/rtc_io.h"
 
-RTC_DATA_ATTR bool DEEPSLEEP_TIMELAPS;
+RTC_DATA_ATTR bool DEEPSLEEP_TIMELAPSE;
 RTC_DATA_ATTR unsigned int fileIndex = 0;
 RTC_DATA_ATTR unsigned int lapseIndex = 0;
 unsigned long DEFAULT_INTERVAL = 10;
 unsigned short DEFAULT_DEEPSLEEP = 0;
 bool mjpeg = true;
 bool lapseRunning = false;
-unsigned long nexttimelaps = 0;
+unsigned long nexttimelapse = 0;
 
-bool TimeLapsStart()
+bool TimeLapseStart()
 {
     if(lapseRunning) return true;
     fileIndex = 0;
@@ -28,27 +28,27 @@ bool TimeLapsStart()
             SDCreateDir(path);
             lapseRunning = true;
 
-            if(PrefLoadInt("deepsleep", DEFAULT_DEEPSLEEP, true) == 1) { DEEPSLEEP_TIMELAPS = true; }
-            else { DEEPSLEEP_TIMELAPS = false; }
+            if(PrefLoadInt("deepsleep", DEFAULT_DEEPSLEEP, true) == 1) { DEEPSLEEP_TIMELAPSE = true; }
+            else { DEEPSLEEP_TIMELAPSE = false; }
             return true;
         }
     }
 	return false;
 }
 
-bool TimeLapsStop()
+bool TimeLapseStop()
 {
     lapseRunning = false;
     return true;
 }
 
-bool TimeLapsProcess()
+bool TimeLapseProcess()
 {
-    if(DEEPSLEEP_TIMELAPS != true)
+    if(DEEPSLEEP_TIMELAPSE != true)
     {
         if(!lapseRunning) return false;
-        if(nexttimelaps >  millis() ) return false;
-        nexttimelaps = millis() + (1000 * PrefLoadInt("interval", DEFAULT_INTERVAL, true));
+        if(nexttimelapse >  millis() ) return false;
+        nexttimelapse = millis() + (1000 * PrefLoadInt("interval", DEFAULT_INTERVAL, true));
     }
 
     camera_fb_t *fb = NULL;
@@ -70,7 +70,7 @@ bool TimeLapsProcess()
     fileIndex++;
     esp_camera_fb_return(fb);
 
-    if(DEEPSLEEP_TIMELAPS == true)
+    if(DEEPSLEEP_TIMELAPSE == true)
     {
         Serial.println("GoDeepSleep");
         Serial.flush();
