@@ -311,7 +311,6 @@ static esp_err_t HTTPAppHandlerCMD(httpd_req_t *req)
 		res = s->set_ae_level(s, val);
 	else if (!strcmp(variable, "interval"))
 	{
-		TimeLapsSetInterval(val);
 		PrefSaveInt("interval",val, true);
 	}
 	else if (!strcmp(variable, "rotate")) 
@@ -367,7 +366,8 @@ static esp_err_t HTTPAppHandlerStatus(httpd_req_t *req)
 	p += sprintf(p, "\"hmirror\":%u,", s->status.hmirror);
 	p += sprintf(p, "\"dcw\":%u,", s->status.dcw);
 	p += sprintf(p, "\"colorbar\":%u,", s->status.colorbar);
-	p += sprintf(p, "\"interval\":%d,", PrefLoadInt("interval", 0, true));
+	p += sprintf(p, "\"interval\":%d,", PrefLoadInt("interval", DEFAULT_INTERVAL, true));
+	p += sprintf(p, "\"deepsleep\":%u,", PrefLoadInt("deepsleep", 0, true));
 	p += sprintf(p, "\"rotate\":%d", PrefLoadInt("rotate", 0, true) );
 	*p++ = '}';
 	*p++ = 0;

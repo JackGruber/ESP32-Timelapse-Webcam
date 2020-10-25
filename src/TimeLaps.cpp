@@ -2,18 +2,12 @@
 #include "esp_camera.h"
 #include <stdio.h>
 #include "SD.h"
+#include "Pref.h"
 
-unsigned int fileIndex = 0;
-unsigned int lapseIndex = 0;
-unsigned long TIMELAPSINTERVAL = 1;
+unsigned long DEFAULT_INTERVAL = 10;
 bool mjpeg = true;
 bool lapseRunning = false;
 unsigned long nexttimelaps = 0;
-
-void TimeLapsSetInterval(unsigned long interval)
-{
-    TIMELAPSINTERVAL = interval;
-}
 
 bool TimeLapsStart()
 {
@@ -43,7 +37,7 @@ bool TimeLapsProcess()
 {
     if(!lapseRunning) return false;
     if(nexttimelaps >  millis() ) return false;
-    nexttimelaps = millis() + (1000 * TIMELAPSINTERVAL);
+    nexttimelaps = millis() + (1000 * PrefLoadInt("interval", DEFAULT_INTERVAL, true));
 
     camera_fb_t *fb = NULL;
     fb = esp_camera_fb_get();
