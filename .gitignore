@@ -14,3 +14,5 @@ wifi_credentials.h
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+
+include/version_build.h

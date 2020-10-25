@@ -545,6 +545,13 @@ R"(<!doctype html>
                             <label for="interval">Time-Lapse Interval [seconds]</label>
                             <input type="number" id="interval" min="0" max="86400" value="1" class="default-action">
                         </div>
+                        <div class="input-group" id="deepsleep-group">
+                            <label for="deepsleep">DeepSleep</label>
+                            <div class="switch">
+                                <input id="deepsleep" type="checkbox" class="default-action" checked="checked">
+                                <label class="slider" for="deepsleep"></label>
+                            </div>
+                        </div>
                         <section id="buttons">
                             <button id="get-still">Get Still</button>
                             <button id="toggle-lapse">Start Time-Lapse</button>

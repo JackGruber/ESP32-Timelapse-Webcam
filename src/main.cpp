@@ -8,6 +8,7 @@
 #include "version_build.h"
 #include "Pref.h"
 
+
 bool STOP_RESET = false;
 unsigned long ESP_RESTART = 0;
 
@@ -18,12 +19,21 @@ void setup()
   Serial.println("Sketch: " VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH "." BUILD_COMMIT "-" BUILD_BRANCH);
   Serial.println("Builddate: " BUILD_DATE " " BUILD_TIME);
 
-  if (PrefLoadInt("clearsettings",1,true)) { PrefClear(); }
-  PrefSaveInt("clearsettings",1 , true);
+  if(DEEPSLEEP_TIMELAPS != true) 
+  {
+    if (PrefLoadInt("clearsettings",1,true)) { PrefClear(); }
+    PrefSaveInt("clearsettings",1 , true);
+  }
 
   SDInitFileSystem();
   CameraInit();
   if(CameraLoadSettings()) { Serial.println("Setting Load OK"); };
+
+  if(DEEPSLEEP_TIMELAPS == true) 
+  { 
+    Serial.println("DEEPSLEEP_TIMELAPS");
+    TimeLapsProcess(); 
+  }
 
   WiFiInit();
 

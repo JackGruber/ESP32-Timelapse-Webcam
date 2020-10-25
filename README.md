@@ -38,7 +38,6 @@ ffmpeg.exe -r 60 -f image2 -i "C:\Temp\timelapse\pic%05d.jpg"  -codec libx264 -c
 
 ## ToDO
 * Add NTP time sync
-* Add DeepSleep option for timelaps
 
 ## Links
 * [Original GitHub repro ESP32CamTimeLapse](https://github.com/bitluni/ESP32CamTimeLapse)

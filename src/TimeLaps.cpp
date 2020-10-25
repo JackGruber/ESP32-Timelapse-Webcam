@@ -2,18 +2,18 @@
 #include "esp_camera.h"
 #include <stdio.h>
 #include "SD.h"
+#include "Pref.h"
+#include "settings.h"
+#include "driver/rtc_io.h"
 
-unsigned int fileIndex = 0;
-unsigned int lapseIndex = 0;
-unsigned long TIMELAPSINTERVAL = 1;
+RTC_DATA_ATTR bool DEEPSLEEP_TIMELAPS;
+RTC_DATA_ATTR unsigned int fileIndex = 0;
+RTC_DATA_ATTR unsigned int lapseIndex = 0;
+unsigned long DEFAULT_INTERVAL = 10;
+unsigned short DEFAULT_DEEPSLEEP = 0;
 bool mjpeg = true;
 bool lapseRunning = false;
 unsigned long nexttimelaps = 0;
-
-void TimeLapsSetInterval(unsigned long interval)
-{
-    TIMELAPSINTERVAL = interval;
-}
 
 bool TimeLapsStart()
 {
@@ -27,6 +27,9 @@ bool TimeLapsStart()
         {
             SDCreateDir(path);
             lapseRunning = true;
+
+            if(PrefLoadInt("deepsleep", DEFAULT_DEEPSLEEP, true) == 1) { DEEPSLEEP_TIMELAPS = true; }
+            else { DEEPSLEEP_TIMELAPS = false; }
             return true;
         }
     }
@@ -41,9 +44,12 @@ bool TimeLapsStop()
 
 bool TimeLapsProcess()
 {
-    if(!lapseRunning) return false;
-    if(nexttimelaps >  millis() ) return false;
-    nexttimelaps = millis() + (1000 * TIMELAPSINTERVAL);
+    if(DEEPSLEEP_TIMELAPS != true)
+    {
+        if(!lapseRunning) return false;
+        if(nexttimelaps >  millis() ) return false;
+        nexttimelaps = millis() + (1000 * PrefLoadInt("interval", DEFAULT_INTERVAL, true));
+    }
 
     camera_fb_t *fb = NULL;
     fb = esp_camera_fb_get();
@@ -63,6 +69,21 @@ bool TimeLapsProcess()
     }
     fileIndex++;
     esp_camera_fb_return(fb);
+
+    if(DEEPSLEEP_TIMELAPS == true)
+    {
+        Serial.println("GoDeepSleep");
+        Serial.flush();
+
+        // disable flash
+        pinMode(GPIO_NUM_4, OUTPUT);
+        digitalWrite(GPIO_NUM_4, LOW);
+        rtc_gpio_hold_en(GPIO_NUM_4); 
+
+        gpio_deep_sleep_hold_en();
+        esp_sleep_enable_timer_wakeup(PrefLoadInt("interval", DEFAULT_INTERVAL, true) * 1000000);
+        esp_deep_sleep_start();
+    }
 
     return true;
 }

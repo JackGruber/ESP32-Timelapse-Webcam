@@ -59,8 +59,10 @@ bool SDInitFileSystem()
       Serial.println("Card Mount Failed (SDMMC_HOST_FLAG_1BIT)");
       return false;
     }
-    pinMode(LED_FLASH, OUTPUT);
-    digitalWrite(LED_FLASH, LOW);
+    
+    // Turn Flash off
+    pinMode(GPIO_NUM_4, OUTPUT);
+    digitalWrite(GPIO_NUM_4, LOW);
   #else
     if (!SD_MMC.begin())
     {
