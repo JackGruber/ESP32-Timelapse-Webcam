@@ -52,12 +52,11 @@ void WiFiCreateAP(void)
 {
   Serial.println("Starting AP ...");
 
-  IPAddress apIP(192,168,4,22);
-  IPAddress gateway(192,168,4,9);
+  IPAddress apIP(192,168,4,1);
   IPAddress subnet(255,255,255,0);
 
   WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(apIP, gateway, subnet);
+  WiFi.softAPConfig(apIP, apIP, subnet);
 
   if (!WiFi.softAP(AP_SSID, AP_PASSWORD, 1, 0))
   {
